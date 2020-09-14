@@ -1,24 +1,20 @@
-namespace SinglyLinkedList.Tests
+namespace Problem02.DoublyLinkedList.Tests
 {
     using System;
+    using System.Linq;
+    using System.Reflection;
+    using DoublyLinkedList;
     using NUnit.Framework;
-    using Problem04.SinglyLinkedList;
 
     [TestFixture]
-    public class SinglyLinkedListTests
+    public class LinkedListTests
     {
         private readonly Random _random = new Random();
-        private IAbstractLinkedList<int> _list;
-
-        [SetUp]
-        public void InitializeLinkedList()
-        {
-            this._list = new SinglyLinkedList<int>();
-        }
 
         [Test]
         public void AddFirstShouldWorkAsExpected()
         {
+            var list = GetList();
             var count = this._random.Next(10, 30);
             var array = new int[count];
 
@@ -26,18 +22,19 @@ namespace SinglyLinkedList.Tests
             {
                 var randomValue = this._random.Next(100);
                 array[count - i] = randomValue;
-                _list.AddFirst(randomValue);
-                Assert.AreEqual(i, _list.Count);
+                list.AddFirst(randomValue);
+                Assert.AreEqual(i, list.Count);
             }
 
             var index = 0;
-            foreach (var listElement in _list)
+            foreach (var listElement in list)
                 Assert.AreEqual(array[index++], listElement);
         }
 
         [Test]
         public void AddLastShouldWorkAsExpected()
         {
+            var list = GetList();
             var count = this._random.Next(10, 30);
             var array = new int[count];
 
@@ -45,18 +42,19 @@ namespace SinglyLinkedList.Tests
             {
                 var randomValue = this._random.Next(100);
                 array[i] = randomValue;
-                _list.AddLast(randomValue);
-                Assert.AreEqual(i + 1, _list.Count);
+                list.AddLast(randomValue);
+                Assert.AreEqual(i + 1, list.Count);
             }
 
             var index = 0;
-            foreach (var listElement in _list)
+            foreach (var listElement in list)
                 Assert.AreEqual(array[index++], listElement);
         }
 
         [Test]
         public void RemoveFirstShouldWorkAsExpected()
         {
+            var list = GetList();
             var count = this._random.Next(10, 30);
             var array = new int[count];
 
@@ -64,26 +62,29 @@ namespace SinglyLinkedList.Tests
             {
                 var randomValue = this._random.Next(100);
                 array[i] = randomValue;
-                _list.AddLast(randomValue);
+                list.AddLast(randomValue);
             }
 
             for (var i = 0; i < count; i++)
             {
-                var removedElement = _list.RemoveFirst();
+                var removedElement = list.RemoveFirst();
                 Assert.AreEqual(array[i], removedElement);
-                Assert.AreEqual(array.Length - (i + 1), _list.Count);
+                Assert.AreEqual(array.Length - (i + 1), list.Count);
             }
         }
 
         [Test]
         public void RemoveFirstShouldThrowAnExceptionIfInvalidIndexIsPassed()
         {
-            Assert.Throws<InvalidOperationException>(() => _list.RemoveFirst());
+            var list = GetList();
+
+            Assert.Throws<InvalidOperationException>(() => list.RemoveFirst());
         }
 
         [Test]
         public void RemoveLastShouldWorkAsExpected()
         {
+            var list = GetList();
             var count = this._random.Next(10, 30);
             var array = new int[count];
 
@@ -91,26 +92,29 @@ namespace SinglyLinkedList.Tests
             {
                 var randomValue = this._random.Next(100);
                 array[i] = randomValue;
-                _list.AddFirst(randomValue);
+                list.AddFirst(randomValue);
             }
 
             for (var i = 0; i < count; i++)
             {
-                var removedElement = _list.RemoveLast();
+                var removedElement = list.RemoveLast();
                 Assert.AreEqual(array[i], removedElement);
-                Assert.AreEqual(array.Length - (i + 1), _list.Count);
+                Assert.AreEqual(array.Length - (i + 1), list.Count);
             }
         }
 
         [Test]
         public void RemoveLastShouldThrowAnExceptionIfInvalidIndexIsPassed()
         {
-            Assert.Throws<InvalidOperationException>(() => _list.RemoveLast());
+            var list = GetList();
+
+            Assert.Throws<InvalidOperationException>(() => list.RemoveLast());
         }
 
         [Test]
         public void GetFirstShouldWorkAsExpected()
         {
+            var list = GetList();
             var count = this._random.Next(10, 30);
             var array = new int[count];
 
@@ -118,27 +122,30 @@ namespace SinglyLinkedList.Tests
             {
                 var randomValue = this._random.Next(100);
                 array[i] = randomValue;
-                _list.AddLast(randomValue);
+                list.AddLast(randomValue);
             }
 
             for (var i = 0; i < count; i++)
             {
-                var firstElement = _list.GetFirst();
+                var firstElement = list.GetFirst();
                 Assert.AreEqual(array[i], firstElement);
 
-                _list.RemoveFirst();
+                list.RemoveFirst();
             }
         }
 
         [Test]
         public void GetFirstShouldThrowAnExceptionIfInvalidIndexIsPassed()
         {
-            Assert.Throws<InvalidOperationException>(() => _list.GetFirst());
+            var list = GetList();
+
+            Assert.Throws<InvalidOperationException>(() => list.GetFirst());
         }
 
         [Test]
         public void GetLastShouldWorkAsExpected()
         {
+            var list = GetList();
             var count = this._random.Next(10, 30);
             var array = new int[count];
 
@@ -146,22 +153,44 @@ namespace SinglyLinkedList.Tests
             {
                 var randomValue = this._random.Next(100);
                 array[i] = randomValue;
-                _list.AddFirst(randomValue);
+                list.AddFirst(randomValue);
             }
 
             for (var i = 0; i < count; i++)
             {
-                var lastElement = _list.GetLast();
+                var lastElement = list.GetLast();
                 Assert.AreEqual(array[i], lastElement);
 
-                _list.RemoveLast();
+                list.RemoveLast();
             }
         }
 
         [Test]
         public void GetLastShouldThrowAnExceptionIfInvalidIndexIsPassed()
         {
-            Assert.Throws<InvalidOperationException>(() => _list.GetLast());
+            var list = GetList();
+
+            Assert.Throws<InvalidOperationException>(() => list.GetLast());
         }
+
+        [Test]
+        public void LinkedListContainsTwoPrivateNodes()
+        {
+            var linkedListType = typeof(DoublyLinkedList<>);
+            var allFields = linkedListType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                .Where(f => f.FieldType.Name.Contains("Node"))
+                .ToList();
+            Assert.AreEqual(2, allFields.Count);
+        }
+
+        [Test]
+        public void NodeContainsPropertyPointingToThePreviousOne()
+        {
+            var nodeType = typeof(Node<>);
+            var allProperties = nodeType.GetProperties().Where(p => p.PropertyType == typeof(Node<>)).ToList();
+            Assert.AreEqual(2, allProperties.Count);
+        }
+
+        private static IAbstractLinkedList<int> GetList() => new DoublyLinkedList<int>();
     }
 }
